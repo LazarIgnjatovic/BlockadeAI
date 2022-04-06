@@ -12,7 +12,7 @@ import bisect
 import threading
 
 numberConversion=('1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S')
-sampleState=([11, 14], {"X1": (3, 3), "X2": (7, 3), "O1": (3, 10), "O2": (7, 10)}, {"X1": (0, 0), "X2": (10, 0), "O1": (0, 13), "O2": (10, 13)}, {(3,2):"Z",(5,1):"Z",(5,2):"Z",(3,3):"Z",(2,3):"P",(6,3):"P",(7,3):"P",(6,4):"Z",(3,9):"Z",(6,9):"Z",(2,10):"P",(7,10):"P"}, ([0, 0], [0, 0]),{"X1": {"O1":[],"O2":[]}, "X2": {"O1":[],"O2":[]}, "O1": {"X1":[],"X2":[]}, "O2": {"X1":[],"X2":[]}})
+sampleState=([11, 14], {"X1": (3, 3), "X2": (7, 3), "O1": (3, 10), "O2": (7, 10)}, {"X1": (1, 1), "X2": (9, 1), "O1": (1, 12), "O2": (9, 12)}, {(3,2):"Z",(5,1):"Z",(5,2):"Z",(3,3):"Z",(2,3):"P",(6,3):"P",(7,3):"P",(6,4):"Z",(3,9):"Z",(6,9):"Z",(2,10):"P",(7,10):"P"}, ([1, 0], [1, 0]),{"X1": {"O1":[],"O2":[]}, "X2": {"O1":[],"O2":[]}, "O1": {"X1":[],"X2":[]}, "O2": {"X1":[],"X2":[]}})
 
 def cls():
     os.system('cls' if os.name=='nt' else 'clear')
@@ -224,7 +224,7 @@ def inputMove(state,isX):
         x = numberConversion.index(x)
         y = numberConversion.index(y)
         if not validatePawnMove(state,pawn,x,y):
-            print("Nevalidan potez pijuna")
+            print("Nevalidan potez piuna")
             raise Exception()
         newState=placePawn(pawn,(x,y),state)
         if (isX and newState[4][0]!= (0,0)) or (not isX and newState[4][1]!= (0,0)):
@@ -270,7 +270,8 @@ def startGame(x,y,brZidova,xx1,xy1,xx2,xy2,ox1,oy1,ox2,oy2,isAIFirst):
                 return
 
             #AI/drugi igrac igra potez
-            state=minimax(state,minimaxDepth,isAIFirst)[0]
+            state=inputMove(state,False)
+            #state=minimax(state,minimaxDepth,isAIFirst)[0]
             printBoard(state)
 
         print(isEnd(state)," je pobednik!")
@@ -278,7 +279,8 @@ def startGame(x,y,brZidova,xx1,xy1,xx2,xy2,ox1,oy1,ox2,oy2,isAIFirst):
     else:
         while not isEnd(state):
             #AI/drugi igrac igra potez
-            state=minimax(state,minimaxDepth,isAIFirst)[0]
+            state=inputMove(state,True)
+            #state=minimax(state,minimaxDepth,isAIFirst)[0]
             printBoard(state)
 
             if isEnd(state):
@@ -636,6 +638,17 @@ def recalculatePaths(oldState):
 def validateWallPlacement(state,color,x,y,isX):
     
     potentialState=placeWall((x,y),color,state,isX)
+
+    if x>state[0][0]-1 or x<0 or y>state[0][1]-1 or y<0:
+        return False
+
+    if color=="Z":
+        if x>state[0][0]-2:
+            return False
+    
+    if color=="P":
+        if y>state[0][1]-2:
+            return False
 
     if isX:
         if not ((state[4][0][0]>0 and color=="Z") or (state[4][0][1]>0 and color=="P")):
